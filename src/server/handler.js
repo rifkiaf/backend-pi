@@ -1,4 +1,4 @@
-const { predictClassification, getWikipedia } = require('../services/inferenceService');
+const { predictClassification } = require('../services/inferenceService');
 const storeData = require('../services/storeData');
 const crypto = require('crypto');
 
@@ -15,19 +15,31 @@ async function postPredictHandler(request, h) {
   const formattedDateTime = `${formattedDate}`;
  
   const data = {
-    "id": id,
-    "result": label,
-    "benefit": manfaat,
-    "createdAt": formattedDateTime,
+    id,
+    result: label,
+    benefit: manfaat,
+    createdAt: formattedDateTime,
+  };
+
+  let response;
+
+  if (confidenceScore > 40.50) {
+    // Jika confidence score lebih dari 50.50, tampilkan data
+    response = h.response({
+      status: 'success',
+      message: 'Image successfully predicted',
+      data,
+    });
+    await storeData(id, data);
+  } else {
+    // Jika confidence score kurang dari 60.50, jangan tampilkan data
+    response = h.response({
+      status: 'fail',
+      message: 'Image does not match',
+    });
   }
 
-  const response = h.response({
-    status: 'success',
-    message: confidenceScore > 99.50 ? 'Model is predicted successfully' : 'Model is predicted successfully but under threshold',
-    data
-  })
   response.code(201);
-  await storeData(id, data);
   return response;
 }
  

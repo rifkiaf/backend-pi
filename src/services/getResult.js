@@ -16,8 +16,6 @@ const getResultHandler = async (_request, h) => {
             history: {
                 result: history.result,
                 createdAt: history.createdAt,
-                description: history.description,
-                url: history.url,
                 id: history.id
             }
         }));
